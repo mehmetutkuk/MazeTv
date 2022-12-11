@@ -1,15 +1,42 @@
+using MazeTv.Extensions;
 using MazeTV.Persistence;
+using MazteTv.Service;
+//using MazteTv.Service;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var services = builder.Services;
 // Add services to the container.
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
-string? connectionString = builder.Configuration.GetConnectionString("SqliteConnection");  //Configuration.GetConnectionString("DefaultConnection");
+services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
+
+services.AddSingleton<MazeTvConfiguration>(config =>
+{
+    var configration = config.GetService<IConfiguration>();
+
+    return new MazeTvConfiguration(configration["MazeTvApiRoot"]);
+});
+
+services.AddHttpClient<IMazeTvService, MazeTvService>((provider, client) =>
+{
+    var config = provider.GetService<MazeTvConfiguration>();
+    client.BaseAddress = new Uri(config.BaseUrl);
+});
+
+services.AddScoped<IFetchService, FetchService>();
+
+
+services.AddDbContext<AppDbContext>(opt =>
+{
+    var connStr = builder.Configuration.GetConnectionString("AppDbContext");
+    opt.UseSqlite(connStr);
+   
+},ServiceLifetime.Transient);
 
 var app = builder.Build();
 
@@ -26,4 +53,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+await app.Migration();
+app.Fetch();
+
 app.Run();
+
+

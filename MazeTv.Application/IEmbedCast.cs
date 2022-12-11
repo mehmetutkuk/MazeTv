@@ -1,7 +1,6 @@
 ﻿namespace MazeTv.Application
 {
-    public class Class1
+    public interface IEmbedCast
     {
-
     }
 }

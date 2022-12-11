@@ -12,16 +12,22 @@ namespace MazteTv.Service.Infrastructure
     public static class HttpClientExtensions
     {
         public static async Task<TInput?> Send<TInput, TException>(this HttpClient client, HttpRequestMessage requestMessage,
-          Func<string, string, string, HttpStatusCode, TException> getException) where TException : Exception
+          Func<string, string, string, HttpStatusCode, TException> getException = null) where TException : Exception
         {
             using var response = await client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead)
                 .ConfigureAwait(false);
 
-            var content = await response.Content.ReadAsStringAsync();
 
-            if (!response.IsSuccessStatusCode)
+            if (response.StatusCode.Equals(HttpStatusCode.TooManyRequests))
+            {
+                Thread.Sleep(5000);
+            }
+
+            if (getException != null && !response.IsSuccessStatusCode)
                 throw getException(response.ReasonPhrase, requestMessage.RequestUri.ToString(), client.BaseAddress.ToString(), response.StatusCode);
 
+
+            var content = await response.Content.ReadAsStringAsync();
             TInput data;
 
             if (response.Content == null) return default;

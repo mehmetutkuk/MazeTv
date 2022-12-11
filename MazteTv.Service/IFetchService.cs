@@ -8,5 +8,7 @@ namespace MazteTv.Service
 {
     public interface IFetchService
     {
+        Task FetchShows(CancellationToken cancellationToken = default);
+        Task FetchCast(CancellationToken cancellationToken = default);
     }
 }

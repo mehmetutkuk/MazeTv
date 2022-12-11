@@ -20,7 +20,7 @@ namespace MazteTv.Service
         public Task<GetCastResponse[]?> GetCasts(int id, CancellationToken cancellationToken = default)
         {
             var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"shows/{id}/cast");
-            return client.Send<GetCastResponse[]?, CustomException>(httpRequest, HttpClientExtensions.SetException);
+            return client.Send<GetCastResponse[]?, CustomException>(httpRequest);
         }
 
         public Task<GetShowsResponse?> GetEpisodes(int id, CancellationToken cancellationToken = default)
@@ -38,7 +38,9 @@ namespace MazteTv.Service
 
             var path = HttpClientExtensions.BuildUri("shows", valueCollection);
             var httpRequest = new HttpRequestMessage(HttpMethod.Get, path);
-            return client.Send<GetShowsResponse[]?, CustomException>(httpRequest, HttpClientExtensions.SetException);
+return client.Send<GetShowsResponse[]?, CustomException>(httpRequest, HttpClientExtensions.SetException);
+
+
         }
     }
 }

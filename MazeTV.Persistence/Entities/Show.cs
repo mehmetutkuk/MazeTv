@@ -10,7 +10,7 @@ namespace MazeTV.Persistence.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public virtual List<Person> Cast { get; set; }
+        public IEnumerable<ShowPerson> Cast { get; set; }
 
     }
 }
